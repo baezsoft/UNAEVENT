@@ -40,8 +40,6 @@ cd UNAEVENT
 
 ```bash
 composer install
-npm install
-npm run dev
 ```
 
 3. Configurar el entorno:

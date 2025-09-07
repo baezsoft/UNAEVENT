@@ -23,3 +23,13 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 use App\Http\Controllers\SalaController;
 
 Route::resource('salas', SalaController::class);
+
+
+use App\Http\Controllers\DisertanteController;
+
+Route::resource('disertantes', DisertanteController::class);
+
+
+use App\Http\Controllers\DisciplinaController;
+
+Route::resource('disciplinas', DisciplinaController::class);

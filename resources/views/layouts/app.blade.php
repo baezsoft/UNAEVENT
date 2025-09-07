@@ -24,6 +24,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('salas.index') }}">Salas</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('disertantes.index') }}">Disertantes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('disciplinas.index') }}">Disciplinas</a>
+                    </li>
                     @if(Auth::user() && Auth::user()->isAdmin())
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.usuarios') }}">Usuarios</a>

@@ -33,3 +33,25 @@ Route::resource('disertantes', DisertanteController::class);
 use App\Http\Controllers\DisciplinaController;
 
 Route::resource('disciplinas', DisciplinaController::class);
+
+use App\Http\Controllers\EventoController;
+
+Route::resource('eventos', EventoController::class);
+
+
+use App\Http\Controllers\AcreditadoController;
+
+// Administración de acreditados (solo usuarios autenticados)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/acreditaciones', [AcreditadoController::class, 'index'])->name('acreditaciones.index');
+    Route::get('/acreditaciones/{acreditado}/edit', [AcreditadoController::class, 'edit'])->name('acreditaciones.edit');
+    Route::put('/acreditaciones/{acreditado}', [AcreditadoController::class, 'update'])->name('acreditaciones.update');
+    Route::get('/acreditaciones/{acreditado}/qr', [AcreditadoController::class, 'qr'])->name('acreditaciones.qr');
+});
+
+// Registro público de acreditados
+Route::get('/acreditaciones/form', [AcreditadoController::class, 'create'])->name('acreditaciones.form');
+Route::post('/acreditaciones/form', [AcreditadoController::class, 'store'])->name('acreditaciones.store');
+
+// Perfil vía token (sin login)
+Route::get('/acreditaciones/perfil/{token}', [AcreditadoController::class, 'show'])->name('acreditaciones.show');

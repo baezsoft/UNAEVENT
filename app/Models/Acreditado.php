@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,9 +10,19 @@ class Acreditado extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_evento', 'fecha_acreditacion', 'estado', 'dni', 'nombre', 
-        'apellido', 'fecha_nacimiento', 'genero', 'nacionalidad', 
-        'telefono', 'correo', 'inhabilitado', 'token'
+        'id_evento',
+        'fecha_acreditacion',
+        'estado',
+        'dni',
+        'nombre',
+        'apellido',
+        'fecha_nacimiento',
+        'genero',
+        'nacionalidad',
+        'telefono',
+        'correo',
+        'inhabilitado',
+        'token'
     ];
 
     protected $casts = [
@@ -33,4 +44,14 @@ class Acreditado extends Model
     {
         return $this->belongsTo(Evento::class, 'id_evento');
     }
+    public function participantes()
+{
+    return $this->hasMany(\App\Models\Participante::class, 'id_acreditado');
+}
+public function actividades()
+{
+    return $this->belongsToMany(Actividad::class, 'participantes', 'id_acreditado', 'id_actividad')
+                ->withPivot('asistencia'); // si necesitas datos de la pivot
+}
+
 }

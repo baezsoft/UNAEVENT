@@ -33,6 +33,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('eventos.index') }}">Eventos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('acreditaciones.index') }}">Acreditados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('actividades.index') }}">Actividades</a>
+                    </li>
                     @if(Auth::user() && Auth::user()->isAdmin())
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.usuarios') }}">Usuarios</a>

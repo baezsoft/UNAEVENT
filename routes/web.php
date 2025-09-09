@@ -55,3 +55,14 @@ Route::post('/acreditaciones/form', [AcreditadoController::class, 'store'])->nam
 
 // Perfil vía token (sin login)
 Route::get('/acreditaciones/perfil/{token}', [AcreditadoController::class, 'show'])->name('acreditaciones.show');
+
+use App\Http\Controllers\ActividadController;
+
+Route::resource('actividades', ActividadController::class)
+    ->parameters(['actividades' => 'actividad']);
+Route::get('/eventos/{evento}/actividades', [App\Http\Controllers\EventoController::class, 'actividades']);
+
+
+use App\Http\Controllers\ParticipanteController;
+
+Route::get('/participantes/{id_acreditado}/{id_actividad}', [ParticipanteController::class, 'marcarAsistencia']);

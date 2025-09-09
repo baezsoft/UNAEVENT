@@ -63,4 +63,16 @@ class EventoController extends Controller
 
         return redirect()->route('eventos.index')->with('success', 'Evento inhabilitado');
     }
+    public function actividades($eventoId)
+    {
+        // Validar que exista el evento
+        $evento = \App\Models\Evento::findOrFail($eventoId);
+    
+        // Obtener actividades vinculadas
+        $actividades = \App\Models\Actividad::where('id_evento', $eventoId)
+            ->get(['id', 'nombre']);
+    
+        return response()->json($actividades);
+    }
+    
 }

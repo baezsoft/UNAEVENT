@@ -46,13 +46,51 @@
         </div>
         <div class="mb-3">
             <label>Evento</label>
-            <select name="id_evento" class="form-control" required>
+            <select name="id_evento" id="id_evento" class="form-control" required>
+                <option value="">Seleccione un evento</option>
                 @foreach(App\Models\Evento::all() as $evento)
                     <option value="{{ $evento->id }}">{{ $evento->nombre }}</option>
                 @endforeach
             </select>
         </div>
+        
+        <div class="mb-3">
+            <label>Actividades</label>
+            <select name="actividades[]" id="actividades" class="form-control" multiple required style="height:200px;">
+                {{-- Opciones se llenan dinámicamente con JS --}}
+            </select>
+            <small>Puede seleccionar varias actividades manteniendo presionada la tecla Ctrl (o Cmd) en Mac.</small>
+        </div>
+        
         <button type="submit" class="btn btn-primary">Registrar</button>
     </form>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const eventoSelect = document.getElementById('id_evento');
+        const actividadesSelect = document.getElementById('actividades');
+    
+        eventoSelect.addEventListener('change', function() {
+            const eventoId = this.value;
+    
+            actividadesSelect.innerHTML = ''; // limpiar opciones
+    
+            if (!eventoId) return;
+    
+            fetch(`/eventos/${eventoId}/actividades`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(act => {
+                        const option = document.createElement('option');
+                        option.value = act.id;
+                        option.textContent = act.nombre;
+                        actividadesSelect.appendChild(option);
+                    });
+                })
+                .catch(err => console.error(err));
+        });
+    });
+    </script>
+    
 @endsection
+

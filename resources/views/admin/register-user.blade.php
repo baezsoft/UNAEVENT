@@ -44,4 +44,67 @@
         <button class="btn btn-success">Registrar</button>
     </form>
 </div>
+
+<style>
+/* Contenedor */
+.container {
+    background-color: #0b3d2e; /* verde oscuro */
+    color: #ffffff;
+    padding: 30px 20px;
+    border-radius: 12px;
+}
+
+/* Encabezado */
+.container h2 {
+    color: #dfffe0;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Inputs y selects */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #004d40;
+    background-color: #ffffff;
+    color: #000;
+}
+
+/* Botones */
+.btn-success {
+    background-color: #2e7d32;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+.btn-success:hover {
+    background-color: #1b5e20;
+}
+
+/* Alertas */
+.alert-success {
+    background-color: #81c784;
+    color: #000;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 10px;
+    }
+
+    .form-control {
+        font-size: 14px;
+    }
+
+    .btn-success {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+    }
+}
+</style>
 @endsection

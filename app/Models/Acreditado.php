@@ -45,13 +45,12 @@ class Acreditado extends Model
         return $this->belongsTo(Evento::class, 'id_evento');
     }
     public function participantes()
-{
-    return $this->hasMany(\App\Models\Participante::class, 'id_acreditado');
-}
-public function actividades()
-{
-    return $this->belongsToMany(Actividad::class, 'participantes', 'id_acreditado', 'id_actividad')
-                ->withPivot('asistencia'); // si necesitas datos de la pivot
-}
-
+    {
+        return $this->hasMany(\App\Models\Participante::class, 'id_acreditado');
+    }
+    public function actividades()
+    {
+        return $this->belongsToMany(Actividad::class, 'participantes', 'id_acreditado', 'id_actividad')
+            ->withPivot('asistencia'); // si necesitas datos de la pivot
+    }
 }

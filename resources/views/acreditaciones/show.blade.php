@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mt-4">
     <h2>Perfil de Acreditado</h2>
 
     <div class="card mt-3">
@@ -36,7 +36,6 @@
                             @foreach($acreditado->actividades as $actividad)
                                 @php
                                     $link = url('/participantes/'.$acreditado->id.'/'.$actividad->id);
-                                    // Generar QR en base64
                                     ob_start();
                                     \QRcode::png($link, null, QR_ECLEVEL_L, 4);
                                     $imageString = ob_get_contents();
@@ -58,4 +57,65 @@
     <br>
     <p>Este perfil se accede mediante un enlace seguro con token, no requiere contraseña.</p>
 </div>
+
+<style>
+/* Contenedor */
+.container {
+    background-color: #0b3d2e; /* verde oscuro */
+    padding: 25px 20px;
+    border-radius: 12px;
+    color: #ffffff;
+}
+
+/* Encabezado */
+.container h2 {
+    color: #dfffe0;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Card */
+.card {
+    background-color: #ffffff;
+    color: #000;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Accordion */
+.accordion-button {
+    background-color: #00695c;
+    color: #fff;
+    font-weight: bold;
+}
+.accordion-button:not(.collapsed) {
+    background-color: #004d40;
+    color: #fff;
+}
+
+/* QR Imagen */
+img {
+    margin-top: 10px;
+    border: 2px solid #004d40;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px 10px;
+    }
+
+    .accordion-button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .col-md-4 {
+        margin-bottom: 15px;
+    }
+}
+</style>
 @endsection

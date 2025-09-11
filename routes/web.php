@@ -2,67 +2,66 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\SalaController;
+use App\Http\Controllers\DisertanteController;
+use App\Http\Controllers\DisciplinaController;
+use App\Http\Controllers\EventoController;
+use App\Http\Controllers\AcreditadoController;
+use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\ParticipanteController;
 
-// Login
+// Login (público)
 Route::get('/login', [UsuarioController::class, 'loginForm'])->name('login');
 Route::post('/login', [UsuarioController::class, 'login']);
 Route::post('/logout', [UsuarioController::class, 'logout'])->name('logout');
 
-// Rutas admin
-Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/register-user', [UsuarioController::class, 'registerForm'])->name('admin.register-user');
-    Route::post('/register-user', [UsuarioController::class, 'register']);
+// Registro público de acreditados (únicas rutas sin auth)
+Route::get('/acreditaciones/form', [AcreditadoController::class, 'create'])->name('acreditaciones.form');
+Route::post('/acreditaciones/form', [AcreditadoController::class, 'store'])->name('acreditaciones.store');
 
-    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('admin.usuarios');
-    Route::get('/usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])->name('admin.edit-usuario');
-    Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])->name('admin.update-usuario');
-    Route::patch('/usuarios/{usuario}/toggle', [UsuarioController::class, 'toggleInhabilitado'])->name('admin.toggle-usuario');
-});
+// Perfil vía token (también sin login)
+Route::get('/acreditaciones/perfil/{token}', [AcreditadoController::class, 'show'])->name('acreditaciones.show');
 
-
-use App\Http\Controllers\SalaController;
-
-Route::resource('salas', SalaController::class);
-
-
-use App\Http\Controllers\DisertanteController;
-
-Route::resource('disertantes', DisertanteController::class);
-
-
-use App\Http\Controllers\DisciplinaController;
-
-Route::resource('disciplinas', DisciplinaController::class);
-
-use App\Http\Controllers\EventoController;
-
-Route::resource('eventos', EventoController::class);
-
-
-use App\Http\Controllers\AcreditadoController;
-
-// Administración de acreditados (solo usuarios autenticados)
+// Todo lo demás requiere autenticación
 Route::middleware(['auth'])->group(function () {
+    // Rutas admin
+    Route::prefix('admin')->group(function () {
+        Route::get('/register-user', [UsuarioController::class, 'registerForm'])->name('admin.register-user');
+        Route::post('/register-user', [UsuarioController::class, 'register']);
+
+        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('admin.usuarios');
+        Route::get('/usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])->name('admin.edit-usuario');
+        Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])->name('admin.update-usuario');
+        Route::patch('/usuarios/{usuario}/toggle', [UsuarioController::class, 'toggleInhabilitado'])->name('admin.toggle-usuario');
+    });
+
+    // Salas
+    Route::resource('salas', SalaController::class);
+
+    // Disertantes
+    Route::resource('disertantes', DisertanteController::class);
+
+    // Disciplinas
+    Route::resource('disciplinas', DisciplinaController::class);
+
+    // Eventos
+    Route::resource('eventos', EventoController::class);
+
+    // Acreditados (solo autenticados)
     Route::get('/acreditaciones', [AcreditadoController::class, 'index'])->name('acreditaciones.index');
     Route::get('/acreditaciones/{acreditado}/edit', [AcreditadoController::class, 'edit'])->name('acreditaciones.edit');
     Route::put('/acreditaciones/{acreditado}', [AcreditadoController::class, 'update'])->name('acreditaciones.update');
     Route::get('/acreditaciones/{acreditado}/qr', [AcreditadoController::class, 'qr'])->name('acreditaciones.qr');
+
+    // Actividades
+    Route::resource('actividades', ActividadController::class)
+        ->parameters(['actividades' => 'actividad']);
+
+    // Participantes
+    Route::get('/participantes/{id_acreditado}/{id_actividad}', [ParticipanteController::class, 'marcarAsistencia']);
 });
+Route::get('/eventos/{evento}/actividades', [EventoController::class, 'actividades']);
 
-// Registro público de acreditados
-Route::get('/acreditaciones/form', [AcreditadoController::class, 'create'])->name('acreditaciones.form');
-Route::post('/acreditaciones/form', [AcreditadoController::class, 'store'])->name('acreditaciones.store');
+use App\Http\Controllers\HomeController;
 
-// Perfil vía token (sin login)
-Route::get('/acreditaciones/perfil/{token}', [AcreditadoController::class, 'show'])->name('acreditaciones.show');
-
-use App\Http\Controllers\ActividadController;
-
-Route::resource('actividades', ActividadController::class)
-    ->parameters(['actividades' => 'actividad']);
-Route::get('/eventos/{evento}/actividades', [App\Http\Controllers\EventoController::class, 'actividades']);
-
-
-use App\Http\Controllers\ParticipanteController;
-
-Route::get('/participantes/{id_acreditado}/{id_actividad}', [ParticipanteController::class, 'marcarAsistencia']);
+Route::get('/', [HomeController::class, 'index'])->name('home');

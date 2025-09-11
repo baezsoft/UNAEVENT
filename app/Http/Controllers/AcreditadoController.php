@@ -111,20 +111,22 @@ class AcreditadoController extends Controller
     // Generar QR
     public function qr(Acreditado $acreditado)
     {
-        $url = route('acreditaciones.show', $acreditado->token);
-
+        $url = "http://192.168.57.29:8000/acreditaciones/perfil/{$acreditado->token}";
+    
         ob_start();
         \QRcode::png($url, null, QR_ECLEVEL_L, 4);
         $imageString = ob_get_contents();
         ob_end_clean();
-
+    
         $qrBase64 = base64_encode($imageString);
-
+    
         return view('acreditaciones.qr', [
             'qr' => $qrBase64,
-            'acreditado' => $acreditado
+            'acreditado' => $acreditado,
+            'url' => $url, // 👈 también lo mandás a la vista si querés mostrarlo en texto
         ]);
     }
+    
 
     // Acceso al perfil vía token
     public function show($token)

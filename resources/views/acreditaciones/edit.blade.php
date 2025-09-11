@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mt-4">
     <h2>Editar Acreditado</h2>
 
     @if(session('success'))
@@ -85,4 +85,73 @@
         <a href="{{ route('acreditaciones.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
+
+<style>
+/* Contenedor */
+.container {
+    background-color: #0b3d2e; /* verde oscuro */
+    padding: 25px 20px;
+    border-radius: 12px;
+    color: #ffffff;
+}
+
+/* Encabezado */
+.container h2 {
+    color: #dfffe0;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Formulario */
+.form-control, .form-select, .form-check-input {
+    border-radius: 10px;
+    border: 1px solid #004d40;
+    background-color: #ffffff;
+    color: #000;
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #00695c;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+.btn-primary:hover {
+    background-color: #004d40;
+}
+.btn-secondary {
+    background-color: #a5d6a7;
+    color: #000;
+    border-radius: 10px;
+    border: none;
+}
+.btn-secondary:hover {
+    background-color: #81c784;
+}
+
+/* Alertas */
+.alert-success {
+    background-color: #81c784;
+    color: #000;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px 10px;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+    }
+}
+</style>
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Disciplina;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class DisciplinaController extends Controller
 {
@@ -26,15 +27,42 @@ class DisciplinaController extends Controller
         return view('disciplinas.create');
     }
 
+    /** Reglas compartidas entre store y update */
+    protected function rules(?Disciplina $disciplina = null): array
+    {
+        return [
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('disciplinas', 'nombre')->ignore($disciplina?->id),
+            ],
+            'inhabilitado' => ['sometimes', 'boolean'],
+
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre de la disciplina es obligatorio.',
+            'nombre.max'      => 'El nombre no puede superar 100 caracteres.',
+            'nombre.unique'   => 'Ya existe una disciplina con ese nombre.',
+            'inhabilitado.boolean' => 'El valor de inhabilitado debe ser verdadero o falso.',
+
+            // 'area_id.exists' => 'El área seleccionada no existe.',
+        ];
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-        ]);
+        $data = $request->validate($this->rules(), $this->messages());
 
-        Disciplina::create($request->all());
+        Disciplina::create($data);
 
-        return redirect()->route('disciplinas.index')->with('success', 'Disciplina creada correctamente.');
+        return redirect()
+            ->route('disciplinas.index')
+            ->with('success', 'Disciplina creada correctamente.');
     }
 
     public function show(Disciplina $disciplina)
@@ -49,19 +77,21 @@ class DisciplinaController extends Controller
 
     public function update(Request $request, Disciplina $disciplina)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-        ]);
+        $data = $request->validate($this->rules($disciplina), $this->messages());
 
-        $disciplina->update($request->all());
+        $disciplina->update($data);
 
-        return redirect()->route('disciplinas.index')->with('success', 'Disciplina actualizada correctamente.');
+        return redirect()
+            ->route('disciplinas.index')
+            ->with('success', 'Disciplina actualizada correctamente.');
     }
 
     public function destroy(Disciplina $disciplina)
     {
         $disciplina->delete();
 
-        return redirect()->route('disciplinas.index')->with('success', 'Disciplina eliminada correctamente.');
+        return redirect()
+            ->route('disciplinas.index')
+            ->with('success', 'Disciplina eliminada correctamente.');
     }
 }

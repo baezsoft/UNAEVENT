@@ -9,6 +9,7 @@ use App\Http\Controllers\EventoController;
 use App\Http\Controllers\AcreditadoController;
 use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\ParticipanteController;
+use App\Http\Controllers\MovimientosController;
 
 // Login (público)
 Route::get('/login', [UsuarioController::class, 'loginForm'])->name('login');
@@ -65,3 +66,16 @@ Route::get('/eventos/{evento}/actividades', [EventoController::class, 'actividad
 use App\Http\Controllers\HomeController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Movimientos
+Route::middleware(['web'])->group(function () {
+    Route::get('/movimientos', [MovimientosController::class, 'index'])->name('movimientos.index');
+    Route::get('/movimientos/create', [MovimientosController::class, 'create'])->name('movimientos.create');
+    Route::post('/movimientos', [MovimientosController::class, 'store'])->name('movimientos.store');
+
+    // Inhabilitar
+    Route::post('/movimientos/{id}/inhabilitar', [MovimientosController::class, 'inhabilitar'])->name('movimientos.inhabilitar');
+
+    // AJAX: buscar acreditado por DNI
+    Route::get('/acreditados/buscar', [MovimientosController::class, 'buscarAcreditadoPorDNI'])->name('acreditados.buscar');
+}); 

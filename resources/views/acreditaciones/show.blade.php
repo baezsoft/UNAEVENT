@@ -35,7 +35,7 @@
                         <div class="row">
                             @foreach($acreditado->actividades as $actividad)
                                 @php
-                                    $link = url('/participantes/'.$acreditado->id.'/'.$actividad->id);
+                                    $link = url('/participantes/'.$acreditado- >id.'/'.$actividad->id);
                                     ob_start();
                                     \QRcode::png($link, null, QR_ECLEVEL_L, 4);
                                     $imageString = ob_get_contents();

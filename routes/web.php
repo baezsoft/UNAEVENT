@@ -77,5 +77,6 @@ Route::middleware(['web'])->group(function () {
     Route::post('/movimientos/{id}/inhabilitar', [MovimientosController::class, 'inhabilitar'])->name('movimientos.inhabilitar');
 
     // AJAX: buscar acreditado por DNI
-    Route::get('/acreditados/buscar', [MovimientosController::class, 'buscarAcreditadoPorDNI'])->name('acreditados.buscar');
+    Route::get('/acreditados/buscar', [AcreditadoController::class, 'buscar'])
+    ->name('acreditados.buscar');
 }); 

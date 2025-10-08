@@ -73,62 +73,63 @@
     </form>
 </div>
 
-@endsection
-
-@section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const btnBuscar = document.getElementById('btn-buscar-dni');
-    const dniInput = document.getElementById('dni');
-    const acResult = document.getElementById('ac-result');
-    const acNombre = document.getElementById('ac-nombre');
-    const idAcreditado = document.getElementById('id_acreditado');
-
-    btnBuscar.addEventListener('click', function() {
-        const dni = dniInput.value.trim();
-        acResult.textContent = '';
-        acNombre.value = '';
-        idAcreditado.value = '';
-
-        if (!dni) {
-            acResult.textContent = 'Ingrese un DNI.';
-            return;
-        }
-
-        acResult.textContent = 'Buscando...';
-
-        fetch("{{ route('acreditados.buscar') }}?dni=" + encodeURIComponent(dni), {
-            headers: {'X-Requested-With': 'XMLHttpRequest'},
-            credentials: 'same-origin'
-        })
-        .then(resp => resp.json())
-        .then(json => {
-            if (json.found) {
-                acResult.textContent = 'Acreditado encontrado.';
-                acNombre.value = json.nombre;
-                idAcreditado.value = json.id;
-            } else {
-                acResult.textContent = 'No se encontró acreditado con ese DNI.';
-                acNombre.value = '';
-                idAcreditado.value = '';
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnBuscar = document.getElementById('btn-buscar-dni');
+        const dniInput = document.getElementById('dni');
+        const acResult = document.getElementById('ac-result');
+        const acNombre = document.getElementById('ac-nombre');
+        const idAcreditado = document.getElementById('id_acreditado');
+        btnBuscar.addEventListener('click', () => {
+      console.log("Click detectado"); // 👈 debería aparecer en consola
+    });
+        btnBuscar.addEventListener('click', function() {
+            const dni = dniInput.value.trim();
+            acResult.textContent = '';
+            acNombre.value = '';
+            idAcreditado.value = '';
+    
+            if (!dni) {
+                acResult.textContent = 'Ingrese un DNI.';
+                return;
             }
-        })
-        .catch(err => {
-            acResult.textContent = 'Error al buscar acreditado.';
-            console.error(err);
+    
+            acResult.textContent = 'Buscando...';
+    
+            fetch("{{ route('acreditados.buscar') }}?dni=" + encodeURIComponent(dni), {
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                credentials: 'same-origin'
+            })
+            .then(resp => resp.json())
+            .then(json => {
+                if (json.found) {
+                    acResult.textContent = 'Acreditado encontrado.';
+                    acNombre.value = json.nombre;
+                    idAcreditado.value = json.id;
+                } else {
+                    acResult.textContent = 'No se encontró acreditado con ese DNI.';
+                    acNombre.value = '';
+                    idAcreditado.value = '';
+                }
+            })
+            .catch(err => {
+                acResult.textContent = 'Error al buscar acreditado.';
+                console.error(err);
+            });
+        });
+    
+    
+        // Forzar descripcion obligatoria si tipo = salida al enviar
+        const form = document.getElementById('form-mov');
+        form.addEventListener('submit', function(e){
+            const tipo = document.getElementById('tipo').value;
+            const desc = document.getElementById('descripcion').value.trim();
+            if (tipo === 'salida' && desc.length === 0) {
+                e.preventDefault();
+                alert('La descripción es obligatoria para movimientos de tipo salida.');
+            }
         });
     });
-
-    // Forzar descripcion obligatoria si tipo = salida al enviar
-    const form = document.getElementById('form-mov');
-    form.addEventListener('submit', function(e){
-        const tipo = document.getElementById('tipo').value;
-        const desc = document.getElementById('descripcion').value.trim();
-        if (tipo === 'salida' && desc.length === 0) {
-            e.preventDefault();
-            alert('La descripción es obligatoria para movimientos de tipo salida.');
-        }
-    });
-});
-</script>
+    </script>
 @endsection
+

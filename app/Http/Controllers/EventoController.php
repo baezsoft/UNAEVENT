@@ -25,8 +25,11 @@ class EventoController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:150',
-            'fecha' => 'required|date',
-            'tarifa' => 'numeric|min:0',
+            'descripcion' => 'nullable|string',
+            'fecha' => 'required|date|after_or_equal:today',
+            'lugar' => 'nullable|string|max:200',
+            'tarifa' => 'nullable|numeric|min:0',
+            'inhabilitado' => 'boolean',
         ]);
 
         Evento::create($request->all());
@@ -48,8 +51,11 @@ class EventoController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:150',
-            'fecha' => 'required|date',
-            'tarifa' => 'numeric|min:0',
+            'descripcion' => 'nullable|string',
+            'fecha' => 'required|date|after_or_equal:today',
+            'lugar' => 'nullable|string|max:200',
+            'tarifa' => 'nullable|numeric|min:0',
+            'inhabilitado' => 'boolean',
         ]);
 
         $evento->update($request->all());
@@ -63,6 +69,7 @@ class EventoController extends Controller
 
         return redirect()->route('eventos.index')->with('success', 'Evento inhabilitado');
     }
+
     public function actividades($eventoId)
     {
         // Validar que exista el evento
@@ -74,5 +81,4 @@ class EventoController extends Controller
     
         return response()->json($actividades);
     }
-    
 }

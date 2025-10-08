@@ -10,8 +10,8 @@
     </div>
 
     <p>O usa este enlace:</p>
-    <a href="http://192.168.57.29:8000/acreditaciones/perfil/{{ $acreditado->token }}" class="qr-link">
-        http://192.168.57.29:8000/acreditaciones/perfil/{{ $acreditado->token }}
+    <a href="http://localhost:8000/acreditaciones/perfil/{{ $acreditado->token }}" class="qr-link">
+        http://localhost:8000/acreditaciones/perfil/{{ $acreditado->token }}
     </a>
     
     <br><br>

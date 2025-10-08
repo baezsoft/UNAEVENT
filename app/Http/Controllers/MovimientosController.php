@@ -39,27 +39,25 @@ class MovimientosController extends Controller
             'id_acreditado' => 'nullable|exists:acreditados,id',
             'fecha' => 'nullable|date',
         ];
-
-        // si es egreso, descripcion obligatorio
-        if ($request->input('tipo') === 'salida') {
-            $rules['descripcion'] = 'required|string|max:2000';
-        } else {
-            $rules['descripcion'] = 'nullable|string|max:2000';
-        }
-
+    
+        // Si es egreso, la descripción es obligatoria
+        $rules['descripcion'] = $request->input('tipo') === 'salida'
+            ? 'required|string|max:2000'
+            : 'nullable|string|max:2000';
+    
         $validated = $request->validate($rules);
-
-        // Caso especial: inscripción (entrada con id_acreditado)
+    
+        // Caso especial: si es entrada y tiene acreditado → aprobarlo
         if ($validated['tipo'] === 'entrada' && !empty($validated['id_acreditado'])) {
-            $ac = Acreditado::find($validated['id_acreditado']);
-            if ($ac) {
-                $ac->estado = 'activo';
-                $ac->save();
+            $acreditado = Acreditado::find($validated['id_acreditado']);
+            if ($acreditado) {
+                $acreditado->estado = 'Aprobado';
+                $acreditado->save();
             }
         }
-
-        // Insertar movimiento usando el método del modelo
-        $mov = Movimiento::crearMovimiento([
+    
+        // Crear el movimiento
+        Movimiento::crearMovimiento([
             'id_evento' => $validated['id_evento'] ?? null,
             'id_acreditado' => $validated['id_acreditado'] ?? null,
             'tipo' => $validated['tipo'],
@@ -67,9 +65,12 @@ class MovimientosController extends Controller
             'descripcion' => $validated['descripcion'] ?? null,
             'fecha' => $validated['fecha'] ?? Carbon::now(),
         ]);
-
-        return redirect()->route('movimientos.index')->with('success', 'Movimiento registrado correctamente.');
+    
+        return redirect()
+            ->route('movimientos.index')
+            ->with('success', 'Movimiento registrado correctamente y acreditado aprobado.');
     }
+    
 
     // Inhabilitar (no borrar)
     public function inhabilitar($id)
@@ -80,26 +81,41 @@ class MovimientosController extends Controller
         }
         return redirect()->back()->with('error', 'Movimiento no encontrado.');
     }
-
-    // Ruta AJAX: buscar acreditado por DNI
-    public function buscarAcreditadoPorDNI(Request $request)
+    public function buscar(Request $request)
     {
-        $dni = $request->get('dni');
-        if (! $dni) {
-            return response()->json(['error' => 'DNI requerido.'], 422);
+        try {
+            // Solo para peticiones AJAX
+            if (!$request->ajax()) {
+                return response()->json(['found' => false, 'message' => 'Solicitud no válida'], 400);
+            }
+    
+            // Validación de parámetro
+            $validated = $request->validate([
+                'dni' => 'required|string|max:20'
+            ]);
+    
+            // Buscar por CI (ajustá si tu campo es distinto)
+            $acreditado = Acreditado::where('ci', $validated['dni'])->first();
+    
+            if ($acreditado) {
+                return response()->json([
+                    'found' => true,
+                    'id' => $acreditado->id,
+                    'nombre' => trim("{$acreditado->nombre} {$acreditado->apellido}")
+                ]);
+            }
+    
+            return response()->json(['found' => false]);
+    
+        } catch (\Throwable $e) {
+            // Loguea el error en storage/logs/laravel.log
+            \Log::error('Error en buscar acreditado: ' . $e->getMessage());
+            return response()->json([
+                'found' => false,
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $ac = Acreditado::where('dni', $dni)->first();
-
-        if (! $ac) {
-            return response()->json(['found' => false], 200);
-        }
-
-        return response()->json([
-            'found' => true,
-            'id' => $ac->id,
-            'nombre' => ($ac->nombre ?? '') . ' ' . ($ac->apellido ?? ''),
-            'estado' => $ac->estado ?? null,
-        ], 200);
     }
+    
 }

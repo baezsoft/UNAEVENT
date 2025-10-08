@@ -89,6 +89,44 @@ class AcreditadoController extends Controller
                          ->with('success', 'Acreditado registrado correctamente con sus actividades.');
     }
 
+    public function buscar(Request $request)
+    {
+        try {
+            // Solo para peticiones AJAX
+            if (!$request->ajax()) {
+                return response()->json(['found' => false, 'message' => 'Solicitud no válida'], 400);
+            }
+    
+            // Validación de parámetro
+            $validated = $request->validate([
+                'dni' => 'required|string|max:20'
+            ]);
+    
+            // Buscar por CI (ajustá si tu campo es distinto)
+            $acreditado = Acreditado::where('dni', $validated['dni'])->first();
+    
+            if ($acreditado) {
+                return response()->json([
+                    'found' => true,
+                    'id' => $acreditado->id,
+                    'nombre' => trim("{$acreditado->nombre} {$acreditado->apellido}")
+                ]);
+            }
+    
+            return response()->json(['found' => false]);
+    
+        } catch (\Throwable $e) {
+            // Loguea el error en storage/logs/laravel.log
+            \Log::error('Error en buscar acreditado: ' . $e->getMessage());
+            return response()->json([
+                'found' => false,
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+
     // Vista de administración
     public function index(Request $request)
     {

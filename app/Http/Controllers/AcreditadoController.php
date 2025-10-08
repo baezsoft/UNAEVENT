@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class AcreditadoController extends Controller
 {
@@ -24,19 +25,57 @@ class AcreditadoController extends Controller
     // Guardar registro
     public function store(Request $request)
     {
+        $rules = [
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'direccion' => 'nullable|string|max:200',
+            'password' => 'required|string|min:8',
+            'correo' => 'required|email|unique:acreditados,correo',
+            'tel' => 'nullable|string|max:30',
+            'estado' => 'nullable|in:activo,inactivo',
+            'ci' => 'nullable|string|max:20|unique:acreditados,ci',
+            'cargo' => 'nullable|string|max:50',
+            'inhabilitado' => 'boolean',
+            // Ejemplo de clave foránea:
+            'id_evento' => 'required|exists:eventos,id',
+        ];
+
+        $messages = [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.max' => 'El nombre no puede superar 100 caracteres.',
+            'apellido.required' => 'El apellido es obligatorio.',
+            'apellido.max' => 'El apellido no puede superar 100 caracteres.',
+            'direccion.max' => 'La dirección no puede superar 200 caracteres.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'correo.required' => 'El correo es obligatorio.',
+            'correo.email' => 'El correo debe tener un formato válido.',
+            'correo.unique' => 'El correo ya está registrado.',
+            'tel.max' => 'El teléfono no puede superar 30 caracteres.',
+            'estado.in' => 'El estado debe ser "activo" o "inactivo".',
+            'ci.max' => 'El CI no puede superar 20 caracteres.',
+            'ci.unique' => 'El CI ya está registrado.',
+            'cargo.max' => 'El cargo no puede superar 50 caracteres.',
+            'inhabilitado.boolean' => 'El campo inhabilitado debe ser verdadero o falso.',
+            'id_evento.exists' => 'El evento seleccionado no existe.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         $acreditado = Acreditado::create([
-            'dni' => $request->dni,
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'genero' => $request->genero,
-            'correo' => $request->correo,
-            'telefono' => $request->telefono,
-            'nacionalidad' => $request->nacionalidad,
-            'id_evento' => $request->id_evento,
-            'token' => \Illuminate\Support\Str::random(32),
-            'fecha_acreditacion' => $request->fecha_acreditacion ?? \Carbon\Carbon::today()->toDateString()
+            'nombre' => $validated['nombre'],
+            'apellido' => $validated['apellido'],
+            'direccion' => $validated['direccion'] ?? null,
+            'password' => Hash::make($validated['password']),
+            'correo' => $validated['correo'],
+            'telefono' => $validated['tel'] ?? null,
+            'estado' => $validated['estado'] ?? null,
+            'ci' => $validated['ci'] ?? null,
+            'cargo' => $validated['cargo'] ?? null,
+            'inhabilitado' => $validated['inhabilitado'] ?? false,
+            'id_evento' => $validated['id_evento'],
+            'token' => Str::random(32),
+            'fecha_acreditacion' => $request->fecha_acreditacion ?? Carbon::today()->toDateString()
         ]);
         
         // Guardar actividades seleccionadas
@@ -92,19 +131,50 @@ class AcreditadoController extends Controller
     // Actualizar acreditado
     public function update(Request $request, Acreditado $acreditado)
     {
-        $request->validate([
-            'estado' => 'required|string|max:20',
+        $rules = [
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
-            'fecha_nacimiento' => 'nullable|date',
-            'genero' => 'nullable|boolean',
-            'nacionalidad' => 'nullable|string|max:100',
-            'telefono' => 'nullable|string|max:30',
-            'correo' => 'nullable|email|max:150',
-            'inhabilitado' => 'boolean'
-        ]);
+            'direccion' => 'nullable|string|max:200',
+            'password' => 'nullable|string|min:8',
+            'correo' => 'required|email|unique:acreditados,correo,' . $acreditado->id,
+            'tel' => 'nullable|string|max:30',
+            'estado' => 'nullable|in:activo,inactivo',
+            'ci' => 'nullable|string|max:20|unique:acreditados,ci,' . $acreditado->id,
+            'cargo' => 'nullable|string|max:50',
+            'inhabilitado' => 'boolean',
+            'id_evento' => 'required|exists:eventos,id',
+        ];
 
-        $acreditado->update($request->all());
+        $messages = [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.max' => 'El nombre no puede superar 100 caracteres.',
+            'apellido.required' => 'El apellido es obligatorio.',
+            'apellido.max' => 'El apellido no puede superar 100 caracteres.',
+            'direccion.max' => 'La dirección no puede superar 200 caracteres.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'correo.required' => 'El correo es obligatorio.',
+            'correo.email' => 'El correo debe tener un formato válido.',
+            'correo.unique' => 'El correo ya está registrado.',
+            'tel.max' => 'El teléfono no puede superar 30 caracteres.',
+            'estado.in' => 'El estado debe ser "activo" o "inactivo".',
+            'ci.max' => 'El CI no puede superar 20 caracteres.',
+            'ci.unique' => 'El CI ya está registrado.',
+            'cargo.max' => 'El cargo no puede superar 50 caracteres.',
+            'inhabilitado.boolean' => 'El campo inhabilitado debe ser verdadero o falso.',
+            'id_evento.exists' => 'El evento seleccionado no existe.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
+
+        $data = $validated;
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $acreditado->update($data);
+
         return redirect()->route('acreditaciones.index')->with('success', 'Acreditado actualizado.');
     }
 
